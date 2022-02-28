@@ -1,4 +1,4 @@
-import AuthApi from "../apis/backend/AuthApi";
+import AuthApi from "../apis/backend/auth/AuthApi";
 import HttpClient from "../utils/HttpClient";
 
 

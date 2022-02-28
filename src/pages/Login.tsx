@@ -12,8 +12,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import PatioMotormacImage from '../images/patio-motormac.jpeg';
-import AuthService from '../services/backend/authenticate/AuthService';
+import AuthService from '../services/authenticate/AuthService';
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from '../contexts/AuthContext';
+import { useContext } from 'react';
 
 
 function Copyright(props: any) {
@@ -29,23 +31,23 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function Login() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { setToken } = useContext(AuthContext);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const authService = new AuthService()
+
     const data = new FormData(event.currentTarget);
     const authCredentials = {
-      username: String(data.get('username')), 
+      username: String(data.get('username')),
       password: String(data.get('password'))
-  }
-
-  const token = authService.login(authCredentials)
-
-  if (typeof token === "undefined") {
-    return
-  }
-
-  return navigate('/home')
+    }
+    
+    AuthService.login(authCredentials)
+      .then((response) => {
+        setToken(response.token);
+        navigate('/home');
+    }).catch((error: any) => window.alert(error));
   };
   
   return (
