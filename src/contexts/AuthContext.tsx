@@ -16,7 +16,7 @@ export const AuthContext = createContext<AuthContextInterface>(defaultState);
 
 
 export function AuthProvider({ children }: { children: JSX.Element }) {
-    const [token, _setToken] = useState(localStorage.getItem("token"));
+    const [token, _setToken] = useState("");
 
     const setToken = (newToken: string) => _setToken(newToken)
 
