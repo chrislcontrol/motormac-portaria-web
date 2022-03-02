@@ -8,17 +8,16 @@ type loginViewProps = {children: JSX.Element}
 class LoginView {
 
     public validate(props: loginViewProps) {
-        const { isAuthenticated} = useContext(AuthContext)
+      const { isAuthenticated } = useContext(AuthContext);
 
-        if (isAuthenticated) {
-          return <Navigate to='/home'></Navigate>;
-        };
-    
-        return props.children
+      if (isAuthenticated) {
+        return <Navigate to='/home'></Navigate>;
+      };
+  
+      return props.children
     
   };
   
 };
 
 export default new LoginView().validate
-    

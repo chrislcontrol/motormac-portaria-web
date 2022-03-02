@@ -1,7 +1,6 @@
 import AuthApi from "../../apis/backend/auth/AuthApi";
-import { AuthCredentials, AuthResponse } from "../../apis/backend/contracts";
-import { makeAuthApi } from "../../factories/BackendApiFactory";
-import { token, user } from "../../localStorageConstants";
+import { makeAuthApi } from "../../apis/backend/factories";
+import { AuthCredentials, AuthResponse } from "../../apis/backend/models";
 import LocalStorage from "../../utils/LocalStorage";
 
 class AuthService {
@@ -23,6 +22,16 @@ class AuthService {
         return response.data;
 
     }; 
+
+    async isTokenValid(token: string): Promise<boolean> {
+        const response = await this.authApi.validateToken(token)
+
+        if (!(response.status in [200, 401])) {
+            throw new Error(String(response.status))
+        }
+
+        return response.status == 200
+    };
 }
 
 export default new AuthService()

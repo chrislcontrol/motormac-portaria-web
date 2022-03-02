@@ -1,21 +1,19 @@
-import * as React from 'react';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import PatioMotormacImage from '../images/patio-motormac.jpeg';
-import AuthService from '../services/authenticate/AuthService';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import { useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../contexts/AuthContext';
-import { useContext } from 'react';
+import PatioMotormacImage from '../images/patio-motormac.jpeg';
+import AuthService from '../services/authenticate/AuthService';
 
 
 function Copyright(props: any) {
@@ -104,10 +102,6 @@ export default function Login() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-              />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Lembrar-me"
               />
               <Button
                 type="submit"

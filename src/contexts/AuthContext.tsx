@@ -1,27 +1,48 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { makeAuthApi } from "../apis/backend/factories";
+import LocalStorage from "../utils/LocalStorage";
 
-export interface AuthContextInterface {
+const initialValue = {
+    isAuthenticated: false, 
+    setToken: () => {},
+    token: localStorage.token || "",
+    loading: false,
+    setLoading: () => {}
+};
+
+export interface IAuthContext {
     isAuthenticated: boolean
     token?: string | null
     setToken: (newToken: string) => void
-};
-
-const defaultState = {
-    isAuthenticated: false, 
-    setToken: (newToken: string) => {}
+    loading: boolean
+    setLoading: (isLoading: boolean) => void
 };
 
 
-export const AuthContext = createContext<AuthContextInterface>(defaultState); 
+export const AuthContext = createContext<IAuthContext>(initialValue); 
 
 
-export function AuthProvider({ children }: { children: JSX.Element }) {
-    const [token, _setToken] = useState("");
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+    const [token, setToken] = useState(initialValue.token);
+    const [loading, setLoading] = useState(initialValue.loading)
 
-    const setToken = (newToken: string) => _setToken(newToken)
+    useEffect(() => {
+        if (token) {
+            setLoading(true)
+            const authApi = makeAuthApi()
+            authApi.validateToken(token)
+                .catch((response) => {
+                    if (!response.ok) {
+                        setToken("");
+                        LocalStorage.setToken("")
+                    };
+                }).finally(() => setLoading(false));
+        };
+        
+    }, [token]);
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated: !!token, token, setToken }}>
+        <AuthContext.Provider value={{ isAuthenticated: !!token, token, setToken, loading, setLoading }}>
             {children}
         </AuthContext.Provider>
     );

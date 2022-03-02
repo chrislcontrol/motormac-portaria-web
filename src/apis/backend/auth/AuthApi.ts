@@ -1,20 +1,23 @@
-import { BACKEND_URL } from "../../../environments/environmentVars";
 import HttpClient from "../../../utils/HttpClient";
 import { AuthCredentials } from "../models";
 
 export default class AuthApi {
     private httpClient: HttpClient
-    private path: string
+    private path = 'auth'
 
-    constructor({httpClient}: {httpClient: HttpClient}) {
+    constructor(httpClient: HttpClient) {
         this.httpClient = httpClient
-        this.path = 'auth'
-    }
+    };
 
     authenticate({username, password}: AuthCredentials) {
-        const url = `${BACKEND_URL}/${this.path}`
-
-        return this.httpClient.post({url: url, body: {username: username, password: password}})
+        return this.httpClient.post({path: this.path, body: {username: username, password: password}})
 
     };
-}
+
+    validateToken(token: string) {
+        const headers = { Authorization: `Token ${token}` }
+        const path = this.path + '/validate-token'
+
+        return this.httpClient.post({path, requestConfig: {headers: headers}})
+    }
+};
