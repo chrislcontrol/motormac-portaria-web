@@ -1,14 +1,32 @@
-import axios from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+
+export type HttpGETType = {
+    path: string, 
+    requestConfig?: AxiosRequestConfig
+}
+
+export type HttpPostType = {
+    path: string, 
+    body?: object, 
+    requestConfig?: AxiosRequestConfig
+}
 
 export default class HttpClient {
+    private baseURL: any
+    private axiosInstance: AxiosInstance
 
-    get({url, headers, queryParams}: {url: string, headers: any, queryParams: object}) {
-        return axios.get(url, { params: queryParams, headers: headers })
-    }
+    constructor(baseURL: any, authorization?: string) {
+        this.baseURL = baseURL;
+        this.axiosInstance = axios.create({ baseURL: this.baseURL });
 
-    post({url, headers, body}: {url: string, headers?: any, body?: object}) {
-        return axios.post(url, body, { headers: headers })
-    }
-    
+        if (authorization) { this.axiosInstance.defaults.headers.common['authorization'] = authorization };
+    };
 
+    get(props: HttpGETType) {
+        return this.axiosInstance.get(props.path, props.requestConfig)
+    };
+
+    post(props: HttpPostType) {
+        return this.axiosInstance.post(props.path, props.body, props.requestConfig); 
+    };
 }

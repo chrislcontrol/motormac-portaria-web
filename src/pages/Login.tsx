@@ -1,19 +1,19 @@
-import * as React from 'react';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import PatioMotormacImage from '../images/patio-motormac.jpeg';
-import AuthService from '../services/backend/authenticate/AuthService';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import { useContext } from 'react';
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from '../contexts/AuthContext';
+import PatioMotormacImage from '../images/patio-motormac.jpeg';
+import AuthService from '../services/authenticate/AuthService';
 
 
 function Copyright(props: any) {
@@ -29,23 +29,23 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function Login() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { setToken } = useContext(AuthContext);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const authService = new AuthService()
+
     const data = new FormData(event.currentTarget);
     const authCredentials = {
-      username: String(data.get('username')), 
+      username: String(data.get('username')),
       password: String(data.get('password'))
-  }
-
-  const token = authService.login(authCredentials)
-
-  if (typeof token === "undefined") {
-    return
-  }
-
-  return navigate('/home')
+    }
+    
+    AuthService.login(authCredentials)
+      .then((response) => {
+        setToken(response.token);
+        navigate('/home');
+    }).catch((error: any) => window.alert(error));
   };
   
   return (
@@ -102,10 +102,6 @@ export default function Login() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-              />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Lembrar-me"
               />
               <Button
                 type="submit"
