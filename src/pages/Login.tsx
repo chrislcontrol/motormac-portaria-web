@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../contexts/AuthContext';
 import PatioMotormacImage from '../images/patio-motormac.jpeg';
 import AuthService from '../services/authenticate/AuthService';
+import { INTERNOS } from './constants';
 
 
 function Copyright(props: any) {
@@ -44,7 +45,7 @@ export default function Login() {
     AuthService.login(authCredentials)
       .then((response) => {
         setToken(response.token);
-        navigate('/home');
+        navigate(INTERNOS);
     }).catch((error: any) => window.alert(error));
   };
   

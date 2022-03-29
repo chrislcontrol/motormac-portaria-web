@@ -8,7 +8,7 @@ export class ValidateCompany {
     }; 
 
     async companyIsValid(companyId: string): Promise<boolean> {
-        const response = await this.companyApi.listCompanies({ id: companyId }).catch(error => error);
+        const response = await this.companyApi.listCompanies({ document_number: companyId }).catch(error => error);
 
         if (response.isAxiosError) return false;
         

@@ -1,0 +1,5 @@
+export const INTERNOS = '/internos'
+export const INTERNOS__CADASTRAR = INTERNOS + '/cadastrar'
+export const EMPRESAS = '/empresas'
+export const LOGIN = '/login'
+export const EXTERNOS = '/externos'

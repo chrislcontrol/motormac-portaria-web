@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import { CompanyContext } from "../../contexts/CompanyContext";
+import { EMPRESAS, LOGIN } from "../../pages/constants";
 
 type privateViewProps = {children: JSX.Element, hasCompanyValidation?: boolean};
 
@@ -22,8 +23,8 @@ class PrivateView {
       );
     };
 
-    if (!isAuthenticated) { return <Navigate to='/login'></Navigate> };
-    if (!isCompanyIdValid && hasCompanyValidation) { return <Navigate to='/company'></Navigate> };
+    if (!isAuthenticated) { return <Navigate to={LOGIN}></Navigate> };
+    if (!isCompanyIdValid && hasCompanyValidation) { return <Navigate to={EMPRESAS}></Navigate> };
 
     return children;
     

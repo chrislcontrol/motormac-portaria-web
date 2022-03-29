@@ -13,6 +13,10 @@ class LocalStorage {
     localStorage.setItem(companyId, newCompanyId);
   };
 
+  getCompanyId() {
+    return localStorage.getItem('companyId') || null
+  }
+
   getUser() {
     const requiredUser = localStorage.getItem(user) || null
     return requiredUser? JSON.parse(requiredUser) : null
