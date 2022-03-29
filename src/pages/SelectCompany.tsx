@@ -5,13 +5,14 @@ import { CompanyContext } from "../contexts/CompanyContext";
 import { IListCompanies } from "../services/company/contracts";
 import { makeListCompanies } from "../services/company/factory";
 import LocalStorage from "../utils/LocalStorage";
+import { INTERNOS } from "./constants";
 
 const listCompanies: IListCompanies = makeListCompanies()
 const initialValue = [<MenuItem key={"NaN"} value={"NaN"}>{"Selecione uma empresa."}</MenuItem>];
 
 async function loadCompanies(options: any, setOptions: any) {
     const companies = await listCompanies.listAll()
-    companies.forEach(company => setOptions([...options, <MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>]))
+    companies.forEach(company => setOptions([...options, <MenuItem key={company.id} value={company.document_number}>{company.name}</MenuItem>]))
 };
 
 
@@ -48,7 +49,7 @@ export default function () {
                     if (!selectedCompany || selectedCompany === "NaN") { return alert('Selecione uma empresa.')}; 
                     LocalStorage.setCompanyId(selectedCompany);
                     setCompanyId(selectedCompany);
-                    navigate('/home');
+                    navigate(INTERNOS);
                 }}
             >
                 Selecionar
