@@ -1,6 +1,6 @@
 import HttpClient from "../../../utils/HttpClient";
 import LocalStorage from "../../../utils/LocalStorage";
-import { createCarProps, ICarApi } from "./types";
+import { createCarProps, ICarApi, listCarParams } from "./types";
 
 export class CarApi implements ICarApi {
     private path = "cars"
@@ -22,16 +22,21 @@ export class CarApi implements ICarApi {
             km: data.km,
             is_our_fleet: data.isOurFleet,
             boss_company_name: data.bossCompanyName
-        }
+        };
 
-        const response = await this.httpClient.post({
+        return await this.httpClient.post({
             path: this.path,
-            body: body, 
-            requestConfig: {headers}
-        })
-
-        return response
-            
+            body: body,
+            requestConfig: { headers }
+        });
     };
 
-}
+    async listCars(params: listCarParams) {
+        return await this.httpClient.get({
+            path: this.path,
+            requestConfig: { params }
+        });
+        
+    };
+
+};
