@@ -14,6 +14,7 @@ export type CarResponseData = {
     id: string,
     created: Date,
     modified: Date,
+    is_parked: Boolean,
     tag: string,
     model: string,
     manufacturer: string,

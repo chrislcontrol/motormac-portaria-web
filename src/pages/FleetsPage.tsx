@@ -1,37 +1,85 @@
+import { DataGrid, GridEvents } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { makeListCarsUseCase } from '../services/cars/factories';
 import LocalStorage from '../utils/LocalStorage';
 import { EXTERNOS, INTERNOS, INTERNOS__CADASTRAR } from './constants';
 
+const carStatusChoices = {parked: "Parado", inTravel: "Em viagem"}
+
 const initialValues = {
     limit: 10,
     offset: 0, 
-    cars: [{tag: ""}]
+    cars: [
+        {id: "", tag: "", vehicle: "", currentKm: "", status: ""}
+    ]
 };
+
+const columns = [
+    { field: 'tag', headerName: "Placa", width: 300 },
+    { field: "vehicle", headerName: "Veículo", width: 600 },
+    { field: "currentKm", headerName: "KM Atual",  type: "number", width: 250 },
+    { field: "status", headerName: "Status", width: 200 }
+];
 
 
 export default function () {
+
     const navigate = useNavigate()
     const listCarsUseCase = makeListCarsUseCase()
     const ownerCompanyDocumentNumber = LocalStorage.getCompanyId() || ""
-    const [limit, setLimit] = useState(initialValues.limit); 
-    const [offset, setOffset] = useState(initialValues.offset); 
     const [cars, setCars] = useState(initialValues.cars); 
     const [carsCount, setCarsCount] = useState(0)
+    const [selectedCar, setSelectedCar] = useState(initialValues.cars[0])
+    const [isLoadingData, setIsLoadingData] = useState(false)
+    const [travelButton, setTravelButton] = useState(<div/>)
 
     useEffect(() => {
         let mounted = true
-        listCarsUseCase.listFleetCars({ owner_company_document_number: ownerCompanyDocumentNumber, limit, offset })
+        setIsLoadingData(true)
+        listCarsUseCase.listFleetCars({ owner_company_document_number: ownerCompanyDocumentNumber, limit: 999999, offset: 0 })
             .then(carsData => {
                 if (mounted) {
-                    setCars(carsData.results),
-                        setCarsCount(carsData.count)
+                    const remoteCars = carsData.results
+                    const mappedCars = remoteCars.map(car => {
+                        return {
+                            id: car.tag,
+                            tag: car.tag,
+                            vehicle: `${car.manufacturer} - ${car.model}`,
+                            currentKm: car.km,
+                            status: car.is_parked ? carStatusChoices.parked : carStatusChoices
+                        }})
+                    setCars(mappedCars),
+                    setCarsCount(carsData.count)
                 };
             });
-            
+            setIsLoadingData(false)
             return () => {mounted = false}
-    }, [limit, offset]);
+    }, []);
+
+    useEffect(() => {
+        let mounted = true
+        console.log(selectedCar)
+
+        if (mounted) {
+
+            if (!selectedCar.id) setTravelButton(<div />);
+
+            if (selectedCar.status === carStatusChoices.parked) {
+                setTravelButton(<button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={event => navigate(INTERNOS__CADASTRAR)}
+                    style={{ margin: "10px" }}
+                >Lançar viagem
+                </button>)
+            };
+        
+                                                                    
+            if (selectedCar.status === carStatusChoices.inTravel) { setTravelButton(<div />) }
+        }
+        return () => {mounted = false}
+    }, [selectedCar])
 
     return (
         <div>
@@ -87,62 +135,45 @@ export default function () {
                     <div className="card-body">
                         <div className="row">
                         <div className="col-md-6 text-nowrap">
-                                            <div id="dataTable_length" className="dataTables_length" aria-controls="dataTable"><label className="form-label">Mostrar&nbsp;
-                                                <select className="d-inline-block form-select form-select-sm" onChange={event => setLimit(parseInt(event.target.value))}>
-                                                    <option value={initialValues.limit}>{initialValues.limit}</option>
-                                                    <option value={25}>25</option>
-                                                    <option value={50}>50</option>
-                                                    <option value={100}>100</option>
-                                                </select>&nbsp;</label></div>
+                                            
                         </div>
                         <div className="col-md-6">
-                            <div className="text-md-end dataTables_filter" id="dataTable_filter"><label className="form-label"><input type="search" className="form-control form-control-sm" aria-controls="dataTable" placeholder="Procurar placa" /></label></div>
                         </div>
                         </div>
                         <div className="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
-                        <table className="table my-0" id="dataTable">
-                        <thead>
-                            <tr>
-                                <th>Placa</th>
-                                <th>Veículo</th>
-                                <th>KM Atual</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-    
-                        {cars.map(car => (
-                            <tr onClick={() => console.log("clicou em" + car.tag)}>
-                                <td>{car.tag}</td>
-                                <td>{`${car.manufacturer} - ${car.model}`}</td>
-                                <td>{car.km}</td>
-                            </tr>
-                        ))}
+                        <div style={{ height: 400, width: '100%' }}>
+                            <DataGrid
+                                rows={cars}
+                                columns={columns}
+                                pageSize={20}
+                                rowsPerPageOptions={[25, 50, 100]}
+                                checkboxSelection={false}
+                                autoHeight={true}
+                                density="compact"
+                                editMode="row"
+                                loading={isLoadingData}
+                                hideFooterSelectedRowCount={true}
+                                autoPageSize={true}
+                                onCellClick={event => setSelectedCar(event.row)}
+                            />
 
-                                                
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <td><button className="btn btn-primary" type="button" onClick={event => navigate(INTERNOS__CADASTRAR)} >Cadastrar veículo</button></td>
-                            <td />
-                        </tr>
-                        </tfoot>
-                    </table>
                         </div>
-                        <div className="row">
-                        <div className="col-md-6 align-self-center">
-                                            <p id="dataTable_info" className="dataTables_info" role="status" aria-live="polite">Showing {offset + 1} to {offset + limit} of { carsCount }</p>
                         </div>
+                            <div className="row">
+                                <td>
+                                    <button
+                                        className="btn btn-primary"
+                                        type="button" 
+                                        onClick={event => navigate(INTERNOS__CADASTRAR)}
+                                    >Cadastrar veículo
+                                    </button>
+                                    
+                                    {travelButton}
+                                </td>
+
                         <div className="col-md-6">
-                            <nav className="d-lg-flex justify-content-lg-end dataTables_paginate paging_simple_numbers">
-                            <ul className="pagination">
-                                <li className="page-item disabled"><a className="page-link" href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
-                                <li className="page-item active"><a className="page-link" href="#">1</a></li>
-                                <li className="page-item"><a className="page-link" href="#">2</a></li>
-                                <li className="page-item"><a className="page-link" href="#">3</a></li>
-                                <li className="page-item"><a className="page-link" href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
-                            </ul>
-                            </nav>
+                            
+
                         </div>
                         </div>
                     </div>
@@ -154,7 +185,7 @@ export default function () {
                     <div className="text-center my-auto copyright"><span>Copyright © Christian Silva 2022</span></div>
                 </div>
                 </footer>
-            </div><a className="border rounded d-inline scroll-to-top" href="#page-top"><i className="fas fa-angle-up" /></a>
+            </div>
             </div>
         </div>
         );
